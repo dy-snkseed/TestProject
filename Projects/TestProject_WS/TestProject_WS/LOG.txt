@@ -1,0 +1,6 @@
+T : Error: Can't start service
+T : Error: Can't start service
+T : Success install service!
+T : Error: ERROR_SERVICE_EXISTS
+T : Error: ERROR_SERVICE_EXISTS
+T : Error: Can't start service
