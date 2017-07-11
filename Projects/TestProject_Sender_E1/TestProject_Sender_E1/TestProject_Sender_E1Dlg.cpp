@@ -16,7 +16,7 @@
 
 // диалоговое окно CTestProject_Sender_E1Dlg
 
-CMessageSender Sender;
+
 
 CTestProject_Sender_E1Dlg::CTestProject_Sender_E1Dlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CTestProject_Sender_E1Dlg::IDD, pParent)
@@ -96,6 +96,7 @@ HCURSOR CTestProject_Sender_E1Dlg::OnQueryDragIcon()
 
 void CTestProject_Sender_E1Dlg::OnBnClickedButton1()
 {
+	CMessageSender Sender;
 	Sender.SendMessageW(CWriter::GetStringFromEdit(IDC_EDIT2), CWriter::GetStringFromEdit(IDC_EDIT1));
 	//Запишем лог
 	List1.AddString(CWriter::GetCStringTime() + ' ' + CWriter::GetStringFromEdit(IDC_EDIT2).c_str());

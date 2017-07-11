@@ -17,7 +17,6 @@ SERVICE_STATUS_HANDLE hStatus;
 // Единственный объект приложения
 
 CWinApp theApp;
-CWriter Writer;
 const char PREFERED_QUEUE_TO_SERVER[26] = "message_queue_con_to_serv";
 const char PREFERED_QUEUE_TO_CLIENT[26] = "message_queue_con_to_clie";
 
@@ -42,6 +41,7 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 		else
 		{
 				servicePath = LPTSTR(argv[0]);
+				CWriter Writer;
 				if(argc - 1 == 0) {
 					SERVICE_TABLE_ENTRY ServiceTable[1];
 					ServiceTable[0].lpServiceName = serviceName;
@@ -73,7 +73,7 @@ void ServiceMain(int argc, char** argv) {
 	std::this_thread::sleep_for(std::chrono::seconds(10));
 	CMessageReceiver Receiver;
 	CMessageSender Sender;
-
+	CWriter Writer;
 	serviceStatus.dwServiceType    = SERVICE_WIN32_OWN_PROCESS;
 	serviceStatus.dwCurrentState    = SERVICE_START_PENDING;
 	serviceStatus.dwControlsAccepted  = SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN;
@@ -142,6 +142,7 @@ void ServiceMain(int argc, char** argv) {
 }
 
 void ControlHandler(DWORD request) {
+	CWriter Writer;
 	switch(request){
 	case SERVICE_CONTROL_STOP:
 		Writer.AddLogMessage(_T("Stopped."));
@@ -170,6 +171,7 @@ void ControlHandler(DWORD request) {
 
 int InstallService() {
   SC_HANDLE hSCManager = OpenSCManager(NULL, NULL, SC_MANAGER_CREATE_SERVICE);
+  CWriter Writer;
   if(!hSCManager) 
   {
     Writer.AddLogMessage(_T("Error: Can't open Service Control Manager"));
@@ -229,29 +231,31 @@ int InstallService() {
 }
 
 int RemoveService() {
-  SC_HANDLE hSCManager = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
-  if(!hSCManager) 
-  {
-     Writer.AddLogMessage(_T("Error: Can't open Service Control Manager"));
-     return -1;
-  }
-  SC_HANDLE hService = OpenService(hSCManager, serviceName, SERVICE_STOP | DELETE);
-  if(!hService) 
-  {
-     Writer.AddLogMessage(_T("Error: Can't remove service"));
-     CloseServiceHandle(hSCManager);
-     return -1;
-  }
-  
-  DeleteService(hService);
-  CloseServiceHandle(hService);
-  CloseServiceHandle(hSCManager);
-  Writer.AddLogMessage(_T("Success remove service!"));
-  return 0;
+	CWriter Writer;
+	SC_HANDLE hSCManager = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
+	if(!hSCManager) 
+	{
+		Writer.AddLogMessage(_T("Error: Can't open Service Control Manager"));
+		return -1;
+	}
+	SC_HANDLE hService = OpenService(hSCManager, serviceName, SERVICE_STOP | DELETE);
+	if(!hService) 
+	{
+		Writer.AddLogMessage(_T("Error: Can't remove service"));
+		CloseServiceHandle(hSCManager);
+		return -1;
+	}
+
+	DeleteService(hService);
+	CloseServiceHandle(hService);
+	CloseServiceHandle(hSCManager);
+	Writer.AddLogMessage(_T("Success remove service!"));
+	return 0;
 }
 
 int _StartService() {
   SC_HANDLE hSCManager = OpenSCManager(NULL, NULL, SC_MANAGER_CREATE_SERVICE);
+  CWriter Writer;
   //DWORD WINAPI LastErr;
   //HRESULT Result;
   //LastErr = GetLastError();

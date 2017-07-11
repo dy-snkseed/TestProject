@@ -16,8 +16,7 @@
 
 // CTestProject_E1Dlg dialog
 
-CMessageReceiver Receiver;
-CWriter Writer;
+
 
 CTestProject_E1Dlg::CTestProject_E1Dlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CTestProject_E1Dlg::IDD, pParent)
@@ -44,6 +43,10 @@ END_MESSAGE_MAP()
 
 // CTestProject_E1Dlg message handlers
 
+CMessageReceiver *Receiver;
+CWriter *Writer;
+
+
 BOOL CTestProject_E1Dlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
@@ -52,6 +55,9 @@ BOOL CTestProject_E1Dlg::OnInitDialog()
 	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
+
+	Receiver = nullptr;
+	Writer = nullptr;
 
 	// TODO: Add extra initialization here
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -110,10 +116,12 @@ void CTestProject_E1Dlg::OnEnChangeEdit1()
 
 void CTestProject_E1Dlg::OnBnClickedButton1()
 {
+	Receiver = new CMessageReceiver;
+	Writer = new CWriter;
 	//Получим название канала
 	//Запустим прослушивание и запись сообщений
-	Receiver.StartListern(CWriter::GetStringFromEdit(IDC_EDIT1));
-	Writer.StartWriting(&Receiver, IDC_LIST1);
+	Receiver->StartListern(CWriter::GetStringFromEdit(IDC_EDIT1));
+	Writer->StartWriting(Receiver, IDC_LIST1);
 	//Отключим кнопку и поле ввода названия канала
 	Button1.EnableWindow(false);
 	Edit1.EnableWindow(false);
@@ -122,10 +130,20 @@ void CTestProject_E1Dlg::OnBnClickedButton1()
 
 void CTestProject_E1Dlg::OnBnClickedButton2()
 {
-	//Остановим прослушивание и запись сообщений
-	Receiver.StopListern();
-	Writer.StopWriting();
-	//Включим кнопку и поле ввода названия канала
-	Button1.EnableWindow(true);
-	Edit1.EnableWindow(true);
+	if(Receiver&&Writer)
+	{
+		//Остановим прослушивание и запись сообщений
+		Receiver->StopListern();
+		Writer->StopWriting();
+
+		delete Receiver;
+		Receiver = nullptr;
+
+		delete Writer;
+		Writer = nullptr;
+
+		//Включим кнопку и поле ввода названия канала
+		Button1.EnableWindow(true);
+		Edit1.EnableWindow(true);
+	}
 }

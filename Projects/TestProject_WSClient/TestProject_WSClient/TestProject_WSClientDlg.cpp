@@ -17,8 +17,7 @@
 // диалоговое окно CTestProject_WSClientDlg
 const char PREFERED_QUEUE_TO_SERVER[26] = "message_queue_con_to_serv";
 const char PREFERED_QUEUE_TO_CLIENT[26] = "message_queue_con_to_clie";
-CMessageReceiver Receiver;
-CWriter Writer;
+
 
 CTestProject_WSClientDlg::CTestProject_WSClientDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CTestProject_WSClientDlg::IDD, pParent)
@@ -46,6 +45,8 @@ END_MESSAGE_MAP()
 
 
 // обработчики сообщений CTestProject_WSClientDlg
+CMessageReceiver *Receiver;
+CWriter *Writer;
 
 BOOL CTestProject_WSClientDlg::OnInitDialog()
 {
@@ -57,7 +58,8 @@ BOOL CTestProject_WSClientDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Мелкий значок
 
 	// TODO: добавьте дополнительную инициализацию
-
+	Receiver = nullptr;
+	Writer = nullptr;
 	return TRUE;  // возврат значения TRUE, если фокус не передан элементу управления
 }
 
@@ -124,10 +126,12 @@ void CTestProject_WSClientDlg::OnEnChangeEdit1()
 
 void CTestProject_WSClientDlg::OnBnClickedButton2()
 {
+	Receiver = new CMessageReceiver;
+	Writer = new CWriter;
 	//Получим название канала
 	//Запустим прослушивание и запись сообщений
-	Receiver.StartListern(std::string(PREFERED_QUEUE_TO_CLIENT));
-	Writer.StartWriting(&Receiver, IDC_LIST2);
+	Receiver->StartListern(std::string(PREFERED_QUEUE_TO_CLIENT));
+	Writer->StartWriting(Receiver, IDC_LIST2);
 	//Отключим кнопку и поле ввода названия канала
 	StartListenButton.EnableWindow(false);
 }
@@ -135,9 +139,16 @@ void CTestProject_WSClientDlg::OnBnClickedButton2()
 
 void CTestProject_WSClientDlg::OnBnClickedButton3()
 {
-	//Остановим прослушивание и запись сообщений
-	Receiver.StopListern();
-	Writer.StopWriting();
-	//Включим кнопку и поле ввода названия канала
-	StartListenButton.EnableWindow(true);
+	if(Receiver&&Writer)
+	{
+		//Остановим прослушивание и запись сообщений
+		Receiver->StopListern();
+		Writer->StopWriting();
+		delete Receiver;
+		Receiver = nullptr;
+		delete Writer;
+		Writer = nullptr;
+		//Включим кнопку и поле ввода названия канала
+		StartListenButton.EnableWindow(true);
+	}
 }
