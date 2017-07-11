@@ -28,19 +28,18 @@ CTestProject_WSClientDlg::CTestProject_WSClientDlg(CWnd* pParent /*=NULL*/)
 void CTestProject_WSClientDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_EDIT1, MessageEditBox);
-	DDX_Control(pDX, IDC_BUTTON2, StartListenButton);
-	DDX_Control(pDX, IDC_LIST1, SendedMessagesList);
-	DDX_Control(pDX, IDC_LIST2, ReceivedMessagesList);
+	DDX_Control(pDX, IDC_MESSAGE_TEXT_EDIT, MessageEditBox);
+	DDX_Control(pDX, IDC_START_LISTEN_BUTTON, StartListenButton);
+	DDX_Control(pDX, IDC_SENDED_MESSAGES_LIST, SendedMessagesList);
+	DDX_Control(pDX, IDC_RECEIVED_MESSAGES_LIST, ReceivedMessagesList);
 }
 
 BEGIN_MESSAGE_MAP(CTestProject_WSClientDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED(IDC_BUTTON1, &CTestProject_WSClientDlg::OnBnClickedButton1)
-	ON_EN_CHANGE(IDC_EDIT1, &CTestProject_WSClientDlg::OnEnChangeEdit1)
-	ON_BN_CLICKED(IDC_BUTTON2, &CTestProject_WSClientDlg::OnBnClickedButton2)
-	ON_BN_CLICKED(IDC_BUTTON3, &CTestProject_WSClientDlg::OnBnClickedButton3)
+	ON_BN_CLICKED(IDC_SEND_MESSAGE_BUTTON, &CTestProject_WSClientDlg::OnBnClicked_SendMessageButton)
+	ON_BN_CLICKED(IDC_START_LISTEN_BUTTON, &CTestProject_WSClientDlg::OnBnClicked_StartListenButton)
+	ON_BN_CLICKED(IDC_STOP_LISTEN_BUTTON, &CTestProject_WSClientDlg::OnBnClicked_StopListenButton)
 END_MESSAGE_MAP()
 
 
@@ -101,7 +100,7 @@ HCURSOR CTestProject_WSClientDlg::OnQueryDragIcon()
 
 
 
-void CTestProject_WSClientDlg::OnBnClickedButton1()
+void CTestProject_WSClientDlg::OnBnClicked_SendMessageButton()
 {
 	USES_CONVERSION;
 	CMessageSender Sender;
@@ -112,32 +111,26 @@ void CTestProject_WSClientDlg::OnBnClickedButton1()
 	CWriter::GetUserSid(hUserToken, &userSid);
 	ConvertSidToStringSid(userSid, &userStringId);
 	HeapFree(GetProcessHeap(), 0, (LPVOID)userSid);
-	Sender.SendMessageW((CWriter::GetStringFromEdit(IDC_EDIT1)+std::string(" from ")+std::string(W2A(userStringId))), std::string(PREFERED_QUEUE_TO_SERVER));
+	Sender.SendMessageW((CWriter::GetStringFromEdit(IDC_MESSAGE_TEXT_EDIT)+std::string(" from ")+std::string(W2A(userStringId))), std::string(PREFERED_QUEUE_TO_SERVER));
 	//Запишем лог
-	SendedMessagesList.AddString(CWriter::GetCStringTime() + ' ' + CWriter::GetStringFromEdit(IDC_EDIT1).c_str());
+	SendedMessagesList.AddString(CWriter::GetCStringTime() + ' ' + CWriter::GetStringFromEdit(IDC_MESSAGE_TEXT_EDIT).c_str());
 }
 
 
-void CTestProject_WSClientDlg::OnEnChangeEdit1()
-{
-
-}
-
-
-void CTestProject_WSClientDlg::OnBnClickedButton2()
+void CTestProject_WSClientDlg::OnBnClicked_StartListenButton()
 {
 	Receiver = new CMessageReceiver;
 	Writer = new CWriter;
 	//Получим название канала
 	//Запустим прослушивание и запись сообщений
 	Receiver->StartListern(std::string(PREFERED_QUEUE_TO_CLIENT));
-	Writer->StartWriting(Receiver, IDC_LIST2);
+	Writer->StartWriting(Receiver, IDC_RECEIVED_MESSAGES_LIST);
 	//Отключим кнопку и поле ввода названия канала
 	StartListenButton.EnableWindow(false);
 }
 
 
-void CTestProject_WSClientDlg::OnBnClickedButton3()
+void CTestProject_WSClientDlg::OnBnClicked_StopListenButton()
 {
 	if(Receiver&&Writer)
 	{

@@ -27,16 +27,13 @@ CTestProject_Sender_E1Dlg::CTestProject_Sender_E1Dlg(CWnd* pParent /*=NULL*/)
 void CTestProject_Sender_E1Dlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_EDIT1, Edit1);
-	DDX_Control(pDX, IDC_EDIT2, Edit2);
-	DDX_Control(pDX, IDC_LIST1, List1);
-	DDX_Control(pDX, IDC_BUTTON1, Button1);
+	DDX_Control(pDX, IDC_SENDED_MESSAGES_LIST, SendedMessagesList);
 }
 
 BEGIN_MESSAGE_MAP(CTestProject_Sender_E1Dlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED(IDC_BUTTON1, &CTestProject_Sender_E1Dlg::OnBnClickedButton1)
+	ON_BN_CLICKED(IDC_SEND_BUTTON, &CTestProject_Sender_E1Dlg::OnBnClicked_SendButton)
 END_MESSAGE_MAP()
 
 
@@ -94,10 +91,10 @@ HCURSOR CTestProject_Sender_E1Dlg::OnQueryDragIcon()
 
 
 
-void CTestProject_Sender_E1Dlg::OnBnClickedButton1()
+void CTestProject_Sender_E1Dlg::OnBnClicked_SendButton()
 {
 	CMessageSender Sender;
-	Sender.SendMessageW(CWriter::GetStringFromEdit(IDC_EDIT2), CWriter::GetStringFromEdit(IDC_EDIT1));
+	Sender.SendMessageW(CWriter::GetStringFromEdit(IDC_MESSAGE_TEXT_EDIT), CWriter::GetStringFromEdit(IDC_QUEUE_NAME_EDIT));
 	//Запишем лог
-	List1.AddString(CWriter::GetCStringTime() + ' ' + CWriter::GetStringFromEdit(IDC_EDIT2).c_str());
+	SendedMessagesList.AddString(CWriter::GetCStringTime() + ' ' + CWriter::GetStringFromEdit(IDC_MESSAGE_TEXT_EDIT).c_str());
 }

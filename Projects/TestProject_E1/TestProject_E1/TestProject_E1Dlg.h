@@ -30,13 +30,10 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnEnChangeEdit1();
-	afx_msg void OnBnClickedButton1();
-	afx_msg void OnEnChangeEdit2();
-	CEdit Edit2;
-	CEdit Edit1;
-	CListBox List1;
-	afx_msg void OnBnClickedButton2();
-	CButton Button1;
+	afx_msg void OnBnClicked_StartListenButton();
+	afx_msg void OnBnClicked_StopListenButton();
+	CButton StartListenButton;
+	CEdit QueueNameEdit;
+	CListBox ReceivedMessagesList;
 };
 

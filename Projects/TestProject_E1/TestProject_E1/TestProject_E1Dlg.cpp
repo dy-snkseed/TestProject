@@ -27,17 +27,16 @@ CTestProject_E1Dlg::CTestProject_E1Dlg(CWnd* pParent /*=NULL*/)
 void CTestProject_E1Dlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_EDIT1, Edit1);
-	DDX_Control(pDX, IDC_LIST1, List1);
-	DDX_Control(pDX, IDC_BUTTON1, Button1);
+	DDX_Control(pDX, IDC_START_LISTEN_BUTTON, StartListenButton);
+	DDX_Control(pDX, IDC_QUEUE_NAME_EDIT, QueueNameEdit);
+	DDX_Control(pDX, IDC_RECEIVED_MESSAGES_LIST, ReceivedMessagesList);
 }
 
 BEGIN_MESSAGE_MAP(CTestProject_E1Dlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_EN_CHANGE(IDC_EDIT1, &CTestProject_E1Dlg::OnEnChangeEdit1)
-	ON_BN_CLICKED(IDC_BUTTON1, &CTestProject_E1Dlg::OnBnClickedButton1)
-	ON_BN_CLICKED(IDC_BUTTON2, &CTestProject_E1Dlg::OnBnClickedButton2)
+	ON_BN_CLICKED(IDC_START_LISTEN_BUTTON, &CTestProject_E1Dlg::OnBnClicked_StartListenButton)
+	ON_BN_CLICKED(IDC_STOP_LISTEN_BUTTON, &CTestProject_E1Dlg::OnBnClicked_StopListenButton)
 END_MESSAGE_MAP()
 
 
@@ -101,49 +100,39 @@ HCURSOR CTestProject_E1Dlg::OnQueryDragIcon()
 
 
 
-void CTestProject_E1Dlg::OnEnChangeEdit1()
-{
-	// TODO:  Если это элемент управления RICHEDIT, то элемент управления не будет
-	// send this notification unless you override the CDialogEx::OnInitDialog()
-	// function and call CRichEditCtrl().SetEventMask()
-	// with the ENM_CHANGE flag ORed into the mask.
-
-     //#1015
-
-	// TODO:  Добавьте код элемента управления
-}
 
 
-void CTestProject_E1Dlg::OnBnClickedButton1()
+void CTestProject_E1Dlg::OnBnClicked_StartListenButton()
 {
 	Receiver = new CMessageReceiver;
 	Writer = new CWriter;
 	//Получим название канала
 	//Запустим прослушивание и запись сообщений
-	Receiver->StartListern(CWriter::GetStringFromEdit(IDC_EDIT1));
-	Writer->StartWriting(Receiver, IDC_LIST1);
+	Receiver->StartListern(CWriter::GetStringFromEdit(IDC_QUEUE_NAME_EDIT));
+	Writer->StartWriting(Receiver, IDC_RECEIVED_MESSAGES_LIST);
 	//Отключим кнопку и поле ввода названия канала
-	Button1.EnableWindow(false);
-	Edit1.EnableWindow(false);
+	StartListenButton.EnableWindow(false);
+	QueueNameEdit.EnableWindow(false);
 }
 
 
-void CTestProject_E1Dlg::OnBnClickedButton2()
+void CTestProject_E1Dlg::OnBnClicked_StopListenButton()
 {
+	//Остановим прослушивание и запись сообщений
 	if(Receiver&&Writer)
 	{
-		//Остановим прослушивание и запись сообщений
 		Receiver->StopListern();
 		Writer->StopWriting();
 
 		delete Receiver;
 		Receiver = nullptr;
 
+
 		delete Writer;
 		Writer = nullptr;
 
 		//Включим кнопку и поле ввода названия канала
-		Button1.EnableWindow(true);
-		Edit1.EnableWindow(true);
+		StartListenButton.EnableWindow(true);
+		QueueNameEdit.EnableWindow(true);
 	}
 }
