@@ -89,16 +89,21 @@ void CWriter::CWriteFileThread(CMessageReceiver *recevier, CWriter *parent)
 }
 bool CWriter::StartWriting(CMessageReceiver *recevier,int idc_list)
 {
-	m_stopWriterThread = false;
-	m_writerThread = new boost::thread( CWriter::CWriteListThread,recevier,this);
-	return true;
+	if(m_stopWriterThread)
+	{
+		m_stopWriterThread = false;
+		m_writerThread = new boost::thread( CWriter::CWriteListThread,recevier,this);
+		return true;
+	}
 }
 bool CWriter::StartWriting(CMessageReceiver *recevier)
 {
-
-	m_stopWriterThread = false;
-	m_writerThread = new boost::thread( CWriter::CWriteFileThread,recevier,this);
-	return true;
+	if(m_stopWriterThread)
+	{
+		m_stopWriterThread = false;
+		m_writerThread = new boost::thread( CWriter::CWriteFileThread,recevier,this);
+		return true;
+	}
 }
 bool CWriter::StopWriting()
 {
