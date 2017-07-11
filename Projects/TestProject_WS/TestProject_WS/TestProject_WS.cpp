@@ -51,6 +51,7 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 					}
 				} else if( wcscmp(argv[argc-1], _T("install")) == 0) {
 					InstallService();
+					_StartService();
 				} else if( wcscmp(argv[argc-1], _T("remove")) == 0) {
 					RemoveService();
 				} else if( wcscmp(argv[argc-1], _T("start")) == 0 ){
