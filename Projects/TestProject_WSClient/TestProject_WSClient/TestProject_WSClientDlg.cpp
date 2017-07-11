@@ -12,6 +12,9 @@
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+#ifndef CW_MESSAGE
+#define CW_MESSAGE (WM_USER + 100)
+#endif
 
 
 // диалоговое окно CTestProject_WSClientDlg
@@ -37,6 +40,7 @@ void CTestProject_WSClientDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CTestProject_WSClientDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_MESSAGE(CW_MESSAGE, &CTestProject_WSClientDlg::OnCwMessage)
 	ON_BN_CLICKED(IDC_SEND_MESSAGE_BUTTON, &CTestProject_WSClientDlg::OnBnClicked_SendMessageButton)
 	ON_BN_CLICKED(IDC_START_LISTEN_BUTTON, &CTestProject_WSClientDlg::OnBnClicked_StartListenButton)
 	ON_BN_CLICKED(IDC_STOP_LISTEN_BUTTON, &CTestProject_WSClientDlg::OnBnClicked_StopListenButton)
@@ -144,4 +148,13 @@ void CTestProject_WSClientDlg::OnBnClicked_StopListenButton()
 		//Включим кнопку и поле ввода названия канала
 		StartListenButton.EnableWindow(true);
 	}
+}
+LRESULT CTestProject_WSClientDlg::OnCwMessage(WPARAM wParam, LPARAM receivedMessage)
+{
+	UNREFERENCED_PARAMETER(receivedMessage);
+	LPTSTR reinterpredMessage = reinterpret_cast<LPTSTR>(receivedMessage);
+	// Handle message here.
+	ReceivedMessagesList.AddString((LPCTSTR)reinterpredMessage);
+	delete[] reinterpredMessage;
+	return 0;
 }

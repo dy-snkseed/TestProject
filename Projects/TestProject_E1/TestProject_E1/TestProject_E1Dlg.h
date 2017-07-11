@@ -30,6 +30,7 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
+	afx_msg LRESULT OnCwMessage(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnBnClicked_StartListenButton();
 	afx_msg void OnBnClicked_StopListenButton();
 	CButton StartListenButton;

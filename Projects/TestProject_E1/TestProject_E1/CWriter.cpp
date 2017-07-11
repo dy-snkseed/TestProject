@@ -54,7 +54,7 @@ std::string CWriter::GetStringFromEdit(int idc_editbox)
 	cStringMessage.ReleaseBuffer();
 	return stdStringText;
 }
-void CWriter::CWriteListThread(CMessageReceiver *recevier, int idc_list, CWriter *parent)
+void CWriter::CWriteListThread(CMessageReceiver *recevier, CWriter *parent)
 {
 	while(parent->m_stopWriterThread==false)
 	{
@@ -64,8 +64,9 @@ void CWriter::CWriteListThread(CMessageReceiver *recevier, int idc_list, CWriter
 			//list->AddString(GetCStringTime() + ' ' + temp1);
 			CString message(GetCStringTime() + ' ' + receivedMessage);
 			LPTSTR  lpBuffer = message.GetBuffer( );
-			HWND listHWnd = ::GetDlgItem(AfxGetApp()->GetMainWnd()->m_hWnd, idc_list);
-			SendMessage(listHWnd, LB_ADDSTRING, 0, (LPARAM)lpBuffer);
+			LPTSTR postLongLivingMessage = new TCHAR[message.GetLength()+1];
+			_tcscpy_s(postLongLivingMessage,message.GetLength( )+1, lpBuffer);
+			PostMessage(AfxGetApp()->GetMainWnd()->m_hWnd, CW_MESSAGE, 0, (LPARAM)postLongLivingMessage);
 			message.ReleaseBuffer();
 		}
 		boost::this_thread::sleep( boost::posix_time::milliseconds(100));
@@ -89,7 +90,7 @@ void CWriter::CWriteFileThread(CMessageReceiver *recevier, CWriter *parent)
 bool CWriter::StartWriting(CMessageReceiver *recevier,int idc_list)
 {
 	m_stopWriterThread = false;
-	m_writerThread = new boost::thread( CWriter::CWriteListThread,recevier,idc_list,this);
+	m_writerThread = new boost::thread( CWriter::CWriteListThread,recevier,this);
 	return true;
 }
 bool CWriter::StartWriting(CMessageReceiver *recevier)

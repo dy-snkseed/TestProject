@@ -12,6 +12,9 @@
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+#ifndef CW_MESSAGE
+#define CW_MESSAGE (WM_USER + 100)
+#endif
 
 
 // CTestProject_E1Dlg dialog
@@ -35,6 +38,7 @@ void CTestProject_E1Dlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CTestProject_E1Dlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_MESSAGE(CW_MESSAGE, &CTestProject_E1Dlg::OnCwMessage)
 	ON_BN_CLICKED(IDC_START_LISTEN_BUTTON, &CTestProject_E1Dlg::OnBnClicked_StartListenButton)
 	ON_BN_CLICKED(IDC_STOP_LISTEN_BUTTON, &CTestProject_E1Dlg::OnBnClicked_StopListenButton)
 END_MESSAGE_MAP()
@@ -135,4 +139,14 @@ void CTestProject_E1Dlg::OnBnClicked_StopListenButton()
 		StartListenButton.EnableWindow(true);
 		QueueNameEdit.EnableWindow(true);
 	}
+}
+
+LRESULT CTestProject_E1Dlg::OnCwMessage(WPARAM wParam, LPARAM receivedMessage)
+{
+	UNREFERENCED_PARAMETER(receivedMessage);
+	LPTSTR reinterpredMessage = reinterpret_cast<LPTSTR>(receivedMessage);
+	// Handle message here.
+	ReceivedMessagesList.AddString((LPCTSTR)reinterpredMessage);
+	delete[] reinterpredMessage;
+	return 0;
 }

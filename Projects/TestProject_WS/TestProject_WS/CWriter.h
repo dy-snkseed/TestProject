@@ -1,6 +1,9 @@
 #pragma once
 #include "Receiver.h"
 #include "stdafx.h"
+#ifndef CW_MESSAGE
+#define CW_MESSAGE (WM_USER + 100)
+#endif
 
 class CWriter
 {
@@ -16,7 +19,7 @@ public:
 	//Получение строки из Edit`a
 	static std::string GetStringFromEdit(int idc_editbox);
 	//Поток записи в ListBox
-	static void CWriteListThread(CMessageReceiver *recevier, int idc_list, CWriter *parent);
+	static void CWriteListThread(CMessageReceiver *recevier, CWriter *parent);
 	//Поток записи в файл для службы
 	static void CWriteFileThread(CMessageReceiver *recevier, CWriter *parent);
 	//Перегрузка запуска потока записи в ListBox

@@ -30,6 +30,7 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
+	afx_msg LRESULT OnCwMessage(WPARAM wParam, LPARAM lParam);
 	CEdit MessageEditBox;
 	CButton StartListenButton;
 	CListBox SendedMessagesList;
