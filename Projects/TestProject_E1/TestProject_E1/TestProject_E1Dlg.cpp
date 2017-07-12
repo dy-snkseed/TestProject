@@ -23,8 +23,15 @@
 
 CTestProject_E1Dlg::CTestProject_E1Dlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CTestProject_E1Dlg::IDD, pParent)
+	, m_receiver(nullptr)
+	, m_writer(nullptr)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+}
+
+CTestProject_E1Dlg::~CTestProject_E1Dlg()
+{
+	StopListen();
 }
 
 void CTestProject_E1Dlg::DoDataExchange(CDataExchange* pDX)
@@ -46,9 +53,6 @@ END_MESSAGE_MAP()
 
 // CTestProject_E1Dlg message handlers
 
-CMessageReceiver *Receiver;
-CWriter *Writer;
-
 
 BOOL CTestProject_E1Dlg::OnInitDialog()
 {
@@ -58,9 +62,6 @@ BOOL CTestProject_E1Dlg::OnInitDialog()
 	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
-
-	Receiver = nullptr;
-	Writer = nullptr;
 
 	// TODO: Add extra initialization here
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -102,39 +103,63 @@ HCURSOR CTestProject_E1Dlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+bool CTestProject_E1Dlg::StartListen()
+{
+	if (m_receiver == nullptr && m_writer == nullptr)
+	{
+		m_receiver = new CMessageReceiver;
+		m_writer = new CWriter;
+		//Получим название канала
+		//Запустим прослушивание и запись сообщений
+		m_receiver->StartListern(CWriter::GetStringFromEdit(IDC_QUEUE_NAME_EDIT));
+		m_writer->StartWriting(m_receiver, IDC_RECEIVED_MESSAGES_LIST);
+	
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 
+bool CTestProject_E1Dlg::StopListen()
+{
+	//Остановим прослушивание и запись сообщений
+	if (m_receiver != nullptr && m_writer != nullptr)
+	{
+		m_receiver->StopListern();
+		m_writer->StopWriting();
 
+		delete m_receiver;
+		m_receiver = nullptr;
 
+		delete m_writer;
+		m_writer = nullptr;
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 
 void CTestProject_E1Dlg::OnBnClicked_StartListenButton()
 {
-	Receiver = new CMessageReceiver;
-	Writer = new CWriter;
-	//Получим название канала
-	//Запустим прослушивание и запись сообщений
-	Receiver->StartListern(CWriter::GetStringFromEdit(IDC_QUEUE_NAME_EDIT));
-	Writer->StartWriting(Receiver, IDC_RECEIVED_MESSAGES_LIST);
-	//Отключим кнопку и поле ввода названия канала
-	StartListenButton.EnableWindow(false);
-	QueueNameEdit.EnableWindow(false);
+	bool result = StartListen();
+	if (result)
+	{
+		//Отключим кнопку и поле ввода названия канала
+		StartListenButton.EnableWindow(false);
+		QueueNameEdit.EnableWindow(false);
+	}
 }
-
 
 void CTestProject_E1Dlg::OnBnClicked_StopListenButton()
 {
-	//Остановим прослушивание и запись сообщений
-	if(Receiver&&Writer)
+	bool result = StopListen();
+	if (result)
 	{
-		Receiver->StopListern();
-		Writer->StopWriting();
-
-		delete Receiver;
-		Receiver = nullptr;
-
-
-		delete Writer;
-		Writer = nullptr;
-
 		//Включим кнопку и поле ввода названия канала
 		StartListenButton.EnableWindow(true);
 		QueueNameEdit.EnableWindow(true);

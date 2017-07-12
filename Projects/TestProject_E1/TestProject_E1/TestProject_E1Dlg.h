@@ -3,15 +3,25 @@
 //
 
 #pragma once
+
 #include "afxwin.h"
+#include "Receiver.h"
+#include "CWriter.h"
 
 
 // CTestProject_E1Dlg dialog
 class CTestProject_E1Dlg : public CDialogEx
 {
+	CMessageReceiver *m_receiver;
+	CWriter *m_writer;
+
+	bool StartListen();
+	bool StopListen();
+
 // Construction
 public:
 	CTestProject_E1Dlg(CWnd* pParent = NULL);	// standard constructor
+	~CTestProject_E1Dlg();	
 
 // Dialog Data
 	enum { IDD = IDD_TESTPROJECT_E1_DIALOG };
