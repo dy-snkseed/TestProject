@@ -4,15 +4,22 @@
 
 #pragma once
 #include "afxwin.h"
+#include "Receiver.h"
+#include "CWriter.h"
 
 
 // диалоговое окно CTestProject_WSClientDlg
 class CTestProject_WSClientDlg : public CDialogEx
 {
 // Создание
+	CMessageReceiver *m_receiver;
+	CWriter *m_writer;
+
+	bool StartListen();
+	bool StopListen();
 public:
 	CTestProject_WSClientDlg(CWnd* pParent = NULL);	// стандартный конструктор
-
+	~CTestProject_WSClientDlg();	
 // Данные диалогового окна
 	enum { IDD = IDD_TESTPROJECT_WSCLIENT_DIALOG };
 

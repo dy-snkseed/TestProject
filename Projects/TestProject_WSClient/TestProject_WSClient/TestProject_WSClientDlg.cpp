@@ -6,8 +6,7 @@
 #include "TestProject_WSClient.h"
 #include "TestProject_WSClientDlg.h"
 #include "afxdialogex.h"
-#include "Receiver.h"
-#include "CWriter.h"
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -24,8 +23,15 @@ const char PREFERED_QUEUE_TO_CLIENT[26] = "message_queue_con_to_clie";
 
 CTestProject_WSClientDlg::CTestProject_WSClientDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CTestProject_WSClientDlg::IDD, pParent)
+	, m_receiver(nullptr)
+	, m_writer(nullptr)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+}
+
+CTestProject_WSClientDlg::~CTestProject_WSClientDlg()
+{
+	StopListen();
 }
 
 void CTestProject_WSClientDlg::DoDataExchange(CDataExchange* pDX)
@@ -48,8 +54,7 @@ END_MESSAGE_MAP()
 
 
 // обработчики сообщений CTestProject_WSClientDlg
-CMessageReceiver *Receiver;
-CWriter *Writer;
+
 
 BOOL CTestProject_WSClientDlg::OnInitDialog()
 {
@@ -61,8 +66,7 @@ BOOL CTestProject_WSClientDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Мелкий значок
 
 	// TODO: добавьте дополнительную инициализацию
-	Receiver = nullptr;
-	Writer = nullptr;
+
 	return TRUE;  // возврат значения TRUE, если фокус не передан элементу управления
 }
 
@@ -102,7 +106,46 @@ HCURSOR CTestProject_WSClientDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+bool CTestProject_WSClientDlg::StartListen()
+{
+	if (m_receiver == nullptr && m_writer == nullptr)
+	{
+		m_receiver = new CMessageReceiver;
+		m_writer = new CWriter;
+		//Получим название канала
+		//Запустим прослушивание и запись сообщений
+		m_receiver->StartListern(std::string(PREFERED_QUEUE_TO_CLIENT));
+		m_writer->StartWriting(m_receiver, IDC_RECEIVED_MESSAGES_LIST);
+	
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 
+bool CTestProject_WSClientDlg::StopListen()
+{
+	//Остановим прослушивание и запись сообщений
+	if (m_receiver != nullptr && m_writer != nullptr)
+	{
+		m_receiver->StopListern();
+		m_writer->StopWriting();
+
+		delete m_receiver;
+		m_receiver = nullptr;
+
+		delete m_writer;
+		m_writer = nullptr;
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 
 void CTestProject_WSClientDlg::OnBnClicked_SendMessageButton()
 {
@@ -123,29 +166,21 @@ void CTestProject_WSClientDlg::OnBnClicked_SendMessageButton()
 
 void CTestProject_WSClientDlg::OnBnClicked_StartListenButton()
 {
-	Receiver = new CMessageReceiver;
-	Writer = new CWriter;
-	//Получим название канала
-	//Запустим прослушивание и запись сообщений
-	Receiver->StartListern(std::string(PREFERED_QUEUE_TO_CLIENT));
-	Writer->StartWriting(Receiver, IDC_RECEIVED_MESSAGES_LIST);
-	//Отключим кнопку и поле ввода названия канала
-	StartListenButton.EnableWindow(false);
+	bool result = StartListen();
+	if (result)
+	{
+		//Отключим кнопку
+		StartListenButton.EnableWindow(false);
+	}
 }
 
 
 void CTestProject_WSClientDlg::OnBnClicked_StopListenButton()
 {
-	if(Receiver&&Writer)
+	bool result = StopListen();
+	if (result)
 	{
-		//Остановим прослушивание и запись сообщений
-		Receiver->StopListern();
-		Writer->StopWriting();
-		delete Receiver;
-		Receiver = nullptr;
-		delete Writer;
-		Writer = nullptr;
-		//Включим кнопку и поле ввода названия канала
+		//Включим кнопку
 		StartListenButton.EnableWindow(true);
 	}
 }
