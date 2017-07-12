@@ -5,14 +5,15 @@
 #define MESSAGES_FILE_NAME "C://MessagesTestService.txt"
 
 CWriter::CWriter()
+	: m_logFile(NULL)
+	, m_messagesFile(NULL)
+	, m_writerThread(NULL)
+	, m_stopWriterThread(true)
+	, m_logFileName(LOG_FILE_NAME)
+	, m_messageFileName(MESSAGES_FILE_NAME)
 {
-	m_logFile = NULL;
-	m_messagesFile = NULL;
-	m_writerThread = NULL;
-	m_stopWriterThread = true;
-	m_logFileName = LOG_FILE_NAME;
-	m_messageFileName = MESSAGES_FILE_NAME;
 }
+
 CWriter::~CWriter()
 {
 	StopWriting();
